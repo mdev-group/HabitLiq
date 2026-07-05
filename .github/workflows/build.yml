@@ -1,13 +1,38 @@
-name: Check Repository Structure
+name: Build iOS App
 
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  check-files:
-    runs-on: macos-14
+  build:
+    runs-on: macos-14  # Spawns the free virtual Mac server
+
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: List All Files
-      run: find . -maxdepth 3 -name "*.xcodeproj"
+    - name: Select Latest Xcode Version
+      run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+    - name: Compile and Archive App
+      run: |
+        xcodebuild -project LiquidGlassHabit/LiquidGlassHabit.xcodeproj \
+                   -scheme LiquidGlassHabit \
+                   -sdk iphoneos \
+                   -configuration Release \
+                   archive -archivePath /tmp/LiquidGlassHabit.xcarchive \
+                   CODE_SIGNING_ALLOWED=NO
+
+    - name: Package into .ipa File
+      run: |
+        mkdir -p Payload
+        cp -r /tmp/LiquidGlassHabit.xcarchive/Products/Applications/LiquidGlassHabit.app Payload/
+        zip -r HabitLiq.ipa Payload
+
+    - name: Upload Finished App Binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: HabitLiq-App
+        path: HabitLiq.ipa
