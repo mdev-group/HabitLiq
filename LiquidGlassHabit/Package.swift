@@ -9,12 +9,9 @@ let package = Package(
     products: [
         .executable(name: "LiquidGlassHabit", targets: ["LiquidGlassHabit"])
     ],
-    dependencies: [],
     targets: [
         .executableTarget(
-            name: "LiquidGlassHabit",
-            dependencies: [],
-            path: "Sources/LiquidGlassHabit"
+            name: "LiquidGlassHabit" // Bypassed the strict path field! Swift will now auto-scan.
         )
     ]
 )
