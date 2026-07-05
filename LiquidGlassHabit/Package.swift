@@ -11,7 +11,9 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "LiquidGlassHabit" // Bypassed the strict path field! Swift will now auto-scan.
+            name: "LiquidGlassHabit",
+            path: ".", // <--- CRUCIAL: Tells the compiler to look right here in the main folder!
+            sources: ["App.swift", "ContentView.swift"] // <--- Points directly to your code files
         )
     ]
 )
