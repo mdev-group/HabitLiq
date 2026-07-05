@@ -12,13 +12,7 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "LiquidGlassHabit",
-            path: ".",
-            sources: [
-                "sources/liquidglasshabit/App.swift",
-                "sources/liquidglasshabit/ContentView.swift",
-                "Sources/LiquidGlassHabit/App.swift",
-                "Sources/LiquidGlassHabit/ContentView.swift"
-            ]
+            path: "LiquidGlassHabit" // Points directly to the subfolder where your .swift files live
         )
     ]
 )
