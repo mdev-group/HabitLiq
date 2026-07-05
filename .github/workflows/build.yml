@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14  # This tells GitHub to spawn a free virtual Mac server
+    runs-on: macos-14  # Spawns the free virtual Mac server
 
     steps:
     - name: Checkout Code
@@ -18,21 +18,21 @@ jobs:
 
     - name: Compile and Archive App
       run: |
-        xcodebuild -project LiquidGlassHabit.xcodeproj \
-                   -scheme LiquidGlassHabit \
+        xcodebuild -project HabitLiq.xcodeproj \
+                   -scheme HabitLiq \
                    -sdk iphoneos \
                    -configuration Release \
-                   archive -archivePath $ResultPath/LiquidGlassHabit.xcarchive \
+                   archive -archivePath /tmp/HabitLiq.xcarchive \
                    CODE_SIGNING_ALLOWED=NO
 
     - name: Package into .ipa File
       run: |
         mkdir -p Payload
-        cp -r /tmp/LiquidGlassHabit.xcarchive/Products/Applications/LiquidGlassHabit.app Payload/
-        zip -r LiquidGlassHabit.ipa Payload
+        cp -r /tmp/HabitLiq.xcarchive/Products/Applications/HabitLiq.app Payload/
+        zip -r HabitLiq.ipa Payload
 
     - name: Upload Finished App Binary
-      uses: actions/releases/upload-artifact@v4
+      uses: actions/upload-artifact@v4
       with:
-        name: LiquidGlassHabit-App
-        path: LiquidGlassHabit.ipa
+        name: HabitLiq-App
+        path: HabitLiq.ipa
