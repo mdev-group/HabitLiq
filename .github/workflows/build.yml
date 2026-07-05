@@ -7,32 +7,27 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14  # Spawns the free virtual Mac server
+    runs-on: macos-14
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Select Latest Xcode Version
-      run: sudo xcode-select -s /Applications/Xcode_15.4.app
-
-    - name: Compile and Archive App
+    - name: Build Application Binary Using SPM
       run: |
-        xcodebuild -project LiquidGlassHabit/LiquidGlassHabit.xcodeproj \
-                   -scheme LiquidGlassHabit \
-                   -sdk iphoneos \
-                   -configuration Release \
-                   archive -archivePath /tmp/LiquidGlassHabit.xcarchive \
-                   CODE_SIGNING_ALLOWED=NO
+        cd LiquidGlassHabit
+        swift build -c release --triple arm64-apple-ios
 
-    - name: Package into .ipa File
+    - name: Package into App Bundle Structure
       run: |
-        mkdir -p Payload
-        cp -r /tmp/LiquidGlassHabit.xcarchive/Products/Applications/LiquidGlassHabit.app Payload/
-        zip -r HabitLiq.ipa Payload
+        cd LiquidGlassHabit
+        mkdir -p Payload/LiquidGlassHabit.app
+        cp .build/arm64-apple-ios/release/LiquidGlassHabit Payload/LiquidGlassHabit.app/LiquidGlassHabit
+        echo '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>CFBundleExecutable</key><string>LiquidGlassHabit</string><key>CFBundleIdentifier</key><string>com.mdev.LiquidGlassHabit</string><key>CFBundleName</key><string>LiquidGlassHabit</string><key>CFBundlePackageType</key><string>APPL</string><key>CFBundleShortVersionString</key><string>1.0</string></dict></plist>' > Payload/LiquidGlassHabit.app/Info.plist
+        zip -r ../LiquidGlassHabit.ipa Payload
 
     - name: Upload Finished App Binary
       uses: actions/upload-artifact@v4
       with:
-        name: HabitLiq-App
-        path: HabitLiq.ipa
+        name: LiquidGlassHabit-App
+        path: LiquidGlassHabit.ipa
