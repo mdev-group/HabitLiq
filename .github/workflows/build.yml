@@ -19,9 +19,12 @@ jobs:
     - name: Build Application Binary Using SPM
       run: |
         cd LiquidGlassHabit
+        SDK_PATH=$(xcrun --sdk iphoneos --show-sdk-path)
         swift build -c release \
           --triple arm64-apple-ios \
-          -Xswiftc "-sdk" -Xswiftc "$(xcrun --sdk iphoneos --show-sdk-path)"
+          -Xswiftc -sdk -Xswiftc "$SDK_PATH" \
+          -Xcc -isysroot -Xcc "$SDK_PATH" \
+          -Xlinker -syslibroot -Xlinker "$SDK_PATH"
 
     - name: Package into App Bundle Structure
       run: |
