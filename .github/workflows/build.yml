@@ -1,0 +1,38 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14  # This tells GitHub to spawn a free virtual Mac server
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Select Latest Xcode Version
+      run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+    - name: Compile and Archive App
+      run: |
+        xcodebuild -project LiquidGlassHabit.xcodeproj \
+                   -scheme LiquidGlassHabit \
+                   -sdk iphoneos \
+                   -configuration Release \
+                   archive -archivePath $ResultPath/LiquidGlassHabit.xcarchive \
+                   CODE_SIGNING_ALLOWED=NO
+
+    - name: Package into .ipa File
+      run: |
+        mkdir -p Payload
+        cp -r /tmp/LiquidGlassHabit.xcarchive/Products/Applications/LiquidGlassHabit.app Payload/
+        zip -r LiquidGlassHabit.ipa Payload
+
+    - name: Upload Finished App Binary
+      uses: actions/releases/upload-artifact@v4
+      with:
+        name: LiquidGlassHabit-App
+        path: LiquidGlassHabit.ipa
