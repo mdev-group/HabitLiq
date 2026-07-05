@@ -1,38 +1,13 @@
-name: Build iOS App
+name: Check Repository Structure
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 jobs:
-  build:
-    runs-on: macos-14  # Spawns the free virtual Mac server
-
+  check-files:
+    runs-on: macos-14
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Select Latest Xcode Version
-      run: sudo xcode-select -s /Applications/Xcode_15.4.app
-
-    - name: Compile and Archive App
-      run: |
-        xcodebuild -project HabitLiq.xcodeproj \
-                   -scheme HabitLiq \
-                   -sdk iphoneos \
-                   -configuration Release \
-                   archive -archivePath /tmp/HabitLiq.xcarchive \
-                   CODE_SIGNING_ALLOWED=NO
-
-    - name: Package into .ipa File
-      run: |
-        mkdir -p Payload
-        cp -r /tmp/HabitLiq.xcarchive/Products/Applications/HabitLiq.app Payload/
-        zip -r HabitLiq.ipa Payload
-
-    - name: Upload Finished App Binary
-      uses: actions/upload-artifact@v4
-      with:
-        name: HabitLiq-App
-        path: HabitLiq.ipa
+    - name: List All Files
+      run: find . -maxdepth 3 -name "*.xcodeproj"
